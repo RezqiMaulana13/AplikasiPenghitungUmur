@@ -76,6 +76,8 @@ public class PenghitungUmurFrame extends javax.swing.JFrame {
             }
         });
     }
+    
+//    cek lagi
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
