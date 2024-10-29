@@ -99,7 +99,9 @@ public class PenghitungUmurHelper {
             JSONObject event = events.getJSONObject(i);
             String year = event.getString("year");
             String description = event.getString("description");
-            String peristiwa = year + ": " + description;
+            String translatedDescription = translateToIndonesian(description);
+            String peristiwa = year + ": " + translatedDescription;
+ 
             javax.swing.SwingUtilities.invokeLater(() -> txtAreaPeristiwa.append(peristiwa + "\n"));
         }
         if (events.length() == 0){
@@ -107,6 +109,32 @@ public class PenghitungUmurHelper {
         }
         } catch (Exception e) {
             javax.swing.SwingUtilities.invokeLater(() -> txtAreaPeristiwa.setText("Gagal mendapatkan data peristiwa: " + e.getMessage()));
+        }
+    }
+    private String translateToIndonesian(String text){
+        try {
+            String urlString = "https://lingva.ml/api/v1/en/id/" + text.replace(" ", "%20");
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+            int responseCode = conn.getResponseCode();
+            if(responseCode != 200){
+                throw new Exception("HTTP response code: " + responseCode);
+            }
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
+            String inputLine;
+            StringBuilder content = new StringBuilder();
+            while ((inputLine = in.readLine()) !=null){
+                content.append(inputLine);
+            }
+            in.close();
+            conn.disconnect();
+            
+            JSONObject json = new JSONObject(content.toString());
+            return json.getString("translation");
+        }catch (Exception e) {
+            return text + " (Gagal diterjemahkan)";
         }
     }
 }
